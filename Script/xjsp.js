@@ -7,8 +7,8 @@ if ($request.url.indexOf("/ucp/index") != -1){
   obj.data.user.isvip = "1";
   obj.data.user.gicon = "V5";
   obj.data.user.gid = "5";
-  obj.data.minivod_play_daily_remainders=666,
-  obj.data.minivod_down_daily_remainders=666;
+  obj.data.minivod_play_daily_remainders="666",
+  obj.data.minivod_down_daily_remainders="666";
 
 }
 if ($request.url.indexOf("/getGlobalData") != -1){
