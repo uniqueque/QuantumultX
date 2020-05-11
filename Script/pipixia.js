@@ -32,9 +32,10 @@ if (body.data.data) {
 } else {
     obj = null;
 }
-console.log(obj);
+
 if (obj instanceof Array) {
     if (obj != null) {
+        console.log(obj);
         for (var i in obj) {
             if (obj[i].ad_info != null) {
                 obj.splice(i, 1);
