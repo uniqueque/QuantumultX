@@ -21,9 +21,9 @@ http-response ^https?://.*\.snssdk\.com/bds/(feed/stream|comment/cell_reply|cell
 [MITM]
 hostname = *.snssdk.com
 */
-console.log($response.body);
-var body = $response.body.replace(/\":([0-9]{15,})/g, '":"$1str"');
-console.log(body);
+
+// var body = $response.body.replace(/\":([0-9]{15,})/g, '":"$1str"');
+var body = $response.body;
 body = JSON.parse(body);
 if (body.data.data) {
     obj = body.data.data;
@@ -37,7 +37,6 @@ if (body.data.data) {
 
 if (obj instanceof Array) {
     if (obj != null) {
-        console.log(obj);
         for (var i in obj) {
             if (obj[i].ad_info != null) {
                 obj.splice(i, 1);
