@@ -9,8 +9,6 @@ if ($request.url.indexOf("/ucp/index") != -1){
   obj.data.user.isvip = "1";
   obj.data.user.gicon = "V5";
   obj.data.user.gid = "5";
-
-
 }
 if ($request.url.indexOf("/getGlobalData") != -1){
   obj.data.app_launch_times_adshow = "0";
