@@ -9,9 +9,9 @@ var body = $response.body;
 var url = $request.url;
 var obj = JSON.parse(body);
 
-const vip = '/api/Movie/WatchMovie';
+const vip = '/api/movie/WatchMovie';
 
-const checkvip = '/api/Account/IsVip';
+const checkvip = '/api/account/IsVip';
 
 const vipinfo = '/api/account/IndexDetail';
 
