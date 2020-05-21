@@ -16,7 +16,9 @@ const checkvip = '/api/Account/IsVip';
 const vipinfo = '/api/account/IndexDetail';
 
 if (url.indexOf(vip) != -1) {
-	obj["canWath"] = "true";
+    obj["canWath"] = true;
+    obj["hadWath"] = true;
+    obj["tipExchange"] = false;
 	body = JSON.stringify(obj);
  }
 
