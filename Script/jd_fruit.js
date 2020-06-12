@@ -31,13 +31,13 @@ function* step() {
             if (!farmTask.signInit.todaySigned) {
                 let signResult = yield signForFarm(); //签到
                 if (signResult.code == "0") {
-                    message += `签到成功，获得${signResult.amount}g,连续签到${signResult.signDay}天\n`
+                    message += `签到成功，获得${signResult.amount}g\n`//连续签到${signResult.signDay}天
                 } else {
                     message += `签到失败,详询日志\n`
                     console.log(`签到结果:  ${JSON.stringify(signResult)}`);
                 }
             } else {
-                message += `今天已签到,连续签到${farmTask.signInit.totalSigned},下次签到可得${farmTask.signInit.signEnergyEachAmount}g\n`
+                // message += `今天已签到,连续签到${farmTask.signInit.totalSigned},下次签到可得${farmTask.signInit.signEnergyEachAmount}g\n`
             }
             console.log(`签到结束,开始广告浏览任务`);
             // let goalResult = yield gotWaterGoalTaskForFarm();
@@ -74,7 +74,7 @@ function* step() {
                 }
                 message += `完成广告浏览任务${browseSuccess}个,失败${browseFail},获得${browseReward}g\n`
             } else {
-                message += '今天已经做过浏览任务\n'
+                // message += '今天已经做过浏览任务\n'
             }
             //定时领水
             if (!farmTask.gotThreeMealInit.f) {
@@ -87,7 +87,7 @@ function* step() {
                     console.log(`定时领水成功结果:  ${JSON.stringify(threeMeal)}`);
                 }
             } else {
-                message += '当前不在定时领水时间断或者已经领过\n'
+                // message += '当前不在定时领水时间断或者已经领过\n'
             }
             //助力
             // masterHelpTaskInitForFarm
@@ -138,7 +138,6 @@ function* step() {
             console.log('finished 水果任务完成!');
             yield browserForTurntableFarm(1);
             yield browserForTurntableFarm(2);
-            console.log('全部任务结束');
             farmInfo = yield initForFarm();
             let infoMessage=`已浇水${farmInfo.farmUserPro.treeEnergy/10}次,还需${(farmInfo.farmUserPro.treeTotalEnergy- farmInfo.farmUserPro.treeEnergy)/10}次领取${farmInfo.farmUserPro.name}\n`
             if (farmInfo.toFlowTimes>(farmInfo.farmUserPro.treeEnergy/10)){
@@ -149,6 +148,8 @@ function* step() {
             }
             infoMessage+=`当前还有${farmInfo.farmUserPro.totalEnergy}g\n`
             message=infoMessage+message
+
+            console.log('全部任务结束');
         } else {
             console.log(`初始化农场数据异常, 请登录京东 app查看农场0元水果功能是否正常,农场初始化数据: ${JSON.stringify(farmInfo)}`);
             message = '初始化农场数据异常, 请登录京东 app查看农场0元水果功能是否正常'
