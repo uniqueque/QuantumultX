@@ -7,11 +7,7 @@ const JD_API_HOST = 'https://api.m.jd.com/client.action';
 //直接用NobyDa的jd cookie
 const cookie = $prefs.valueForKey('CookieJD')
 const name = '京东水果'
-// let $={};
-var shareCodes = [ // 这个列表填入你要助力的好友的shareCode, 最多可能是5个? 没有验证过
-    'a6f686a9f6aa4c80977370b03681c553',
-    'f92cb56c6a1349f5a35f0372aa041ea0',
-]
+
 var Task = step();
 Task.next();
 
@@ -108,7 +104,7 @@ function* step() {
                     }
                     waterCount++
                     farmTask = yield taskInitForFarm();
-                    if (waterResult.finished){
+                    if (waterResult.finished) {
                         //猜测 还没到那阶段 不知道对不对
                         message += `应该可以领取水果了\n`
                     }
@@ -116,7 +112,7 @@ function* step() {
                 message += `浇水${waterCount}次\n`
             }
             //领取首次浇水奖励
-            if (farmTask.firstWaterInit.firstWaterFinished && !farmTask.firstWaterInit.f) {
+            if (!farmTask.firstWaterInit.f && farmTask.firstWaterInit.totalWaterTimes > 0) {
                 let firstWaterReward = yield firstWaterTaskForFarm();
                 if (firstWaterReward.code == '0') {
                     message += `领取首次浇水奖励成功，获得${firstWaterReward.amount}g\n`
@@ -126,10 +122,11 @@ function* step() {
                 }
             }
             //领取10次浇水奖励
-            if (farmTask.totalWaterTaskInit.totalWaterTaskFinished && !farmTask.totalWaterTaskInit.f) {
+            if (!farmTask.totalWaterTaskInit.f && farmTask.totalWaterTaskInit.totalWaterTaskTimes >= farmTask.totalWaterTaskInit.totalWaterTaskLimit) {
                 let totalWaterReward = yield totalWaterTaskForFarm();
                 if (totalWaterReward.code == '0') {
-                    message += `领取10次浇水奖励成功，获得${totalWaterReward.amount}g\n`
+                    console.log(`领取10次浇水奖励结果:  ${JSON.stringify(totalWaterReward)}`);
+                    message += `领取10次浇水奖励成功\n`//，获得${totalWaterReward.amount}g
                 } else {
                     message += '领取10次浇水奖励失败,详询日志\n'
                     console.log(`领取10次浇水奖励结果:  ${JSON.stringify(totalWaterReward)}`);
@@ -139,15 +136,15 @@ function* step() {
             yield browserForTurntableFarm(1);
             yield browserForTurntableFarm(2);
             farmInfo = yield initForFarm();
-            let infoMessage=`已浇水${farmInfo.farmUserPro.treeEnergy/10}次,还需${(farmInfo.farmUserPro.treeTotalEnergy- farmInfo.farmUserPro.treeEnergy)/10}次领取${farmInfo.farmUserPro.name}\n`
-            if (farmInfo.toFlowTimes>(farmInfo.farmUserPro.treeEnergy/10)){
-                infoMessage+=`再浇水${farmInfo.toFlowTimes-farmInfo.farmUserPro.treeEnergy/10}次开花\n`
-            }else if (farmInfo.toFruitTimes>(farmInfo.farmUserPro.treeEnergy/10)){
-                infoMessage+=`再浇水${farmInfo.toFruitTimes-farmInfo.farmUserPro.treeEnergy/10}次结果\n`
-            }else{
+            let infoMessage = `已浇水${farmInfo.farmUserPro.treeEnergy / 10}次,还需${(farmInfo.farmUserPro.treeTotalEnergy - farmInfo.farmUserPro.treeEnergy) / 10}次领取${farmInfo.farmUserPro.name}\n`
+            if (farmInfo.toFlowTimes > (farmInfo.farmUserPro.treeEnergy / 10)) {
+                infoMessage += `再浇水${farmInfo.toFlowTimes - farmInfo.farmUserPro.treeEnergy / 10}次开花\n`
+            } else if (farmInfo.toFruitTimes > (farmInfo.farmUserPro.treeEnergy / 10)) {
+                infoMessage += `再浇水${farmInfo.toFruitTimes - farmInfo.farmUserPro.treeEnergy / 10}次结果\n`
+            } else {
             }
-            infoMessage+=`当前还有${farmInfo.farmUserPro.totalEnergy}g\n`
-            message=infoMessage+message
+            infoMessage += `当前还有${farmInfo.farmUserPro.totalEnergy}g\n`
+            message = infoMessage + message
 
             console.log('全部任务结束');
         } else {
