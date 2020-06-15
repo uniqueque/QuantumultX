@@ -13,7 +13,11 @@ const JD_API_HOST = 'https://api.m.jd.com/client.action';
 //直接用NobyDa的jd cookie
 const cookie = $prefs.valueForKey('CookieJD')
 const name = '京东水果'
- 
+
+var shareCodes = [ // 这个列表填入你要助力的好友的shareCode
+    'a6f686a9f6aa4c80977370b03681c553',
+    'f92cb56c6a1349f5a35f0372aa041ea0',
+]
 var Task = step();
 Task.next();
 
@@ -77,9 +81,9 @@ function* step() {
                         console.log(`广告浏览任务结果:   ${JSON.stringify(browseResult)}`);
                     }
                 }
-                if(browseFail>0){
+                if (browseFail > 0) {
                     message += `【广告浏览】完成${browseSuccess}个,失败${browseFail},获得${browseReward}g\n`
-                }else{
+                } else {
                     message += `【广告浏览】完成${browseSuccess}个,获得${browseReward}g\n`
                 }
             } else {
@@ -102,16 +106,33 @@ function* step() {
             }
             //助力
             // masterHelpTaskInitForFarm
-
-            console.log('即将开始每日浇水任务');
+            console.log('开始助力好友')
+            let salveHelpAddWater = 0;
+            for (let code of shareCodes) {
+                if (code == farmInfo.farmUserPro.shareCode) {
+                    console.log('跳过自己的shareCode')
+                    continue
+                }
+                console.log(`开始助力好友: ${code}`);
+                let helpResult = yield masterHelp(code)
+                if (helpResult.code == 0 && helpResult.helpResult.code == 0) {
+                    salveHelpAddWater += helpResult.helpResult.salveHelpAddWater
+                } else {
+                    console.log(`助理好友结果: ${JSON.stringify(helpResult)}`);
+                }
+            }
+            if (salveHelpAddWater > 0) {
+                message += `【助力好友】获得${salveHelpAddWater}g\n`
+            }
+            console.log('助力好友结束，即将开始每日浇水任务');
             // console.log('当前水滴剩余: ' + farmInfo.farmUserPro.totalEnergy);
             // farmTask = yield taskInitForFarm();
 
             //浇水10次
             if (farmTask.totalWaterTaskInit.totalWaterTaskTimes < farmTask.totalWaterTaskInit.totalWaterTaskLimit) {
                 let waterCount = 0
-                for (; waterCount < farmTask.totalWaterTaskInit.totalWaterTaskLimit-farmTask.totalWaterTaskInit.totalWaterTaskTimes; waterCount++) {
-                    console.log(`第${waterCount+1}次浇水`);
+                for (; waterCount < farmTask.totalWaterTaskInit.totalWaterTaskLimit - farmTask.totalWaterTaskInit.totalWaterTaskTimes; waterCount++) {
+                    console.log(`第${waterCount + 1}次浇水`);
                     let waterResult = yield waterGoodForFarm();
                     console.log(`本次浇水结果:   ${JSON.stringify(waterResult)}`);
                     if (waterResult.code != 0) {//异常中断
@@ -122,7 +143,7 @@ function* step() {
                         message += `【猜测】应该可以领取水果了，请去农场查看\n`
                         break
                     }
-                    if (waterResult.totalEnergy<10){
+                    if (waterResult.totalEnergy < 10) {
                         console.log(`水滴不够，结束浇水`)
                         break
                     }
@@ -194,32 +215,32 @@ function* step() {
                     for (let i = 0; i < turntableFarm.remainLotteryTimes; i++) {
                         let lottery = yield lotteryForTurntableFarm()
                         console.log(`第${i + 1}次抽奖结果${JSON.stringify(lottery)}`)
-                        
+
                         if (lottery.code == 0) {
                             if (lottery.type == "water") {
-                                lotteryResult += `水滴${lottery.addWater}g、`
+                                lotteryResult += `水滴${lottery.addWater}g `
                             } else if (lottery.type == "pingguo") {
-                                lotteryResult += "苹果卡、"
+                                lotteryResult += "苹果卡 "
                             } else if (lottery.type == "baixiangguo") {
-                                lotteryResult += "百香果卡、"
+                                lotteryResult += "百香果卡 "
                             } else if (lottery.type == "mangguo") {
-                                lotteryResult += "芒果卡、"
+                                lotteryResult += "芒果卡 "
                             } else if (lottery.type == "taozi") {
-                                lotteryResult += "桃子卡、"
+                                lotteryResult += "桃子卡 "
                             } else if (lottery.type == "mihoutao") {
-                                lotteryResult += "猕猴桃卡、"
+                                lotteryResult += "猕猴桃卡 "
                             } else if (lottery.type == "pingguo") {
-                                lotteryResult += "苹果卡、"
+                                lotteryResult += "苹果卡 "
                             } else if (lottery.type == "coupon") {
-                                lotteryResult += "优惠券、"
+                                lotteryResult += "优惠券 "
                             } else if (lottery.type == "coupon3") {
-                                lotteryResult += "8斤金枕榴莲、"
+                                lotteryResult += "8斤金枕榴莲 "
                             } else if (lottery.type == "bean") {
-                                lotteryResult += `京豆${lottery.beanCount}个、`
+                                lotteryResult += `京豆${lottery.beanCount}个 `
                             } else if (lottery.type == "hongbao1") {
-                                lotteryResult += `${lottery.hongBao.balance}元无门槛红包、`
-                            }else {
-                                lotteryResult += `未知奖品${lottery.type}、`
+                                lotteryResult += `${lottery.hongBao.balance}元无门槛红包 `
+                            } else {
+                                lotteryResult += `未知奖品${lottery.type} `
                             }
                             //没有次数了
                             if (lottery.remainLotteryTimes == 0) {
@@ -228,7 +249,7 @@ function* step() {
                         }
 
                     }
-                    message+=lotteryResult
+                    message += lotteryResult
                 }
                 console.log('抽奖结束')
 
@@ -259,9 +280,7 @@ function lotteryForTurntableFarm() {
 function timingAwardForTurntableFarm() {
     request(arguments.callee.name.toString(), { version: 4, channel: 1 });
 }
-// https://api.m.jd.com/client.action?functionId=lotteryForTurntableFarm&body={"type":1,"version":4,"channel":1}&appid=wh5
-//https://api.m.jd.com/client.action?functionId=timingAwardForTurntableFarm&body={"version":4,"channel":1}&appid=wh5
-// https://api.m.jd.com/client.action?functionId=lotteryForTurntableFarm&body=%7B%22type%22%3A1%2C%22version%22%3A4%2C%22channel%22%3A1%7D&appid=wh5
+
 // 初始化集卡抽奖活动数据
 function initForTurntableFarm() {
     request(arguments.callee.name.toString(), { version: 4, channel: 1 });
@@ -288,6 +307,15 @@ function gotWaterGoalTaskForFarm() {
     request(arguments.callee.name.toString(), { type: 3 });
 }
 
+//助力好友信息
+function masterHelpTaskInitForFarm() {
+    let functionId = arguments.callee.name.toString();
+    request(functionId);
+}
+
+function masterHelp() {
+    request(`initForFarm`, { imageUrl: "", nickName: "", shareCode: arguments[0], babelChannel: "3", version: 2, channel: 1 });
+}
 
 /**
  * 10次浇水
