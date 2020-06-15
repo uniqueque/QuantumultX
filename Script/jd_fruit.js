@@ -1,13 +1,19 @@
 //jd免费水果 搬的https://github.com/liuxiaoyucc/jd-helper/blob/a6f275d9785748014fc6cca821e58427162e9336/fruit/fruit.js
 //只能quanx用，request里面的请求跟获取cookie的地方改改，别的app应该也能用
 
+
+// [task_local]
+
+// #jd免费水果
+// 1 0 7,12,18 * * * jd_fruit.js, tag=jd免费水果, enabled=true
+
 //京东接口地址
 const JD_API_HOST = 'https://api.m.jd.com/client.action';
 
 //直接用NobyDa的jd cookie
 const cookie = $prefs.valueForKey('CookieJD')
 const name = '京东水果'
-
+ 
 var Task = step();
 Task.next();
 
@@ -71,7 +77,11 @@ function* step() {
                         console.log(`广告浏览任务结果:   ${JSON.stringify(browseResult)}`);
                     }
                 }
-                message += `完成广告浏览任务${browseSuccess}个,失败${browseFail},获得${browseReward}g\n`
+                if(browseFail>0){
+                    message += `【广告浏览】完成${browseSuccess}个,失败${browseFail},获得${browseReward}g\n`
+                }else{
+                    message += `【广告浏览】完成${browseSuccess}个,获得${browseReward}g\n`
+                }
             } else {
                 console.log(`今天已经做过浏览任务`);
                 // message += '今天已经做过浏览任务\n'
@@ -133,8 +143,8 @@ function* step() {
             if (!farmTask.totalWaterTaskInit.f && farmTask.totalWaterTaskInit.totalWaterTaskTimes >= farmTask.totalWaterTaskInit.totalWaterTaskLimit) {
                 let totalWaterReward = yield totalWaterTaskForFarm();
                 if (totalWaterReward.code == '0') {
-                    console.log(`领取10次浇水奖励结果:  ${JSON.stringify(totalWaterReward)}`);
-                    message += `【十次浇水奖励】领取成功\n`//，获得${totalWaterReward.amount}g
+                    // console.log(`领取10次浇水奖励结果:  ${JSON.stringify(totalWaterReward)}`);
+                    message += `【十次浇水奖励】获得${totalWaterReward.totalWaterTaskEnergy}g\n`//，
                 } else {
                     message += '【十次浇水奖励】领取奖励失败,详询日志\n'
                     console.log(`领取10次浇水奖励结果:  ${JSON.stringify(totalWaterReward)}`);
@@ -181,6 +191,7 @@ function* step() {
                     for (let i = 0; i < turntableFarm.remainLotteryTimes; i++) {
                         let lottery = yield lotteryForTurntableFarm()
                         console.log(`第${i + 1}次抽奖结果${JSON.stringify(lottery)}`)
+                        
                         if (lottery.code == 0) {
                             if (lottery.type == "water") {
                                 lotteryResult += "水滴、"
@@ -191,7 +202,7 @@ function* step() {
                             } else if (lottery.type == "mangguo") {
                                 lotteryResult += "芒果卡、"
                             } else if (lottery.type == "taozi") {
-                                lotteryResult += "套子卡、"
+                                lotteryResult += "桃子卡、"
                             } else if (lottery.type == "mihoutao") {
                                 lotteryResult += "猕猴桃卡、"
                             } else if (lottery.type == "pingguo") {
@@ -202,7 +213,9 @@ function* step() {
                                 lotteryResult += "8斤金枕榴莲、"
                             } else if (lottery.type == "bean") {
                                 lotteryResult += "京豆、"
-                            } else {
+                            } else if (lottery.type == "hongbao1") {
+                                lotteryResult += `${lottery.hongBao.balance}元无门槛红包、`
+                            }else {
                                 lotteryResult += `未知奖品${lottery.type}、`
                             }
                             //没有次数了
