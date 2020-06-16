@@ -79,8 +79,18 @@ function* step() {
             } else {
                 console.log(`浏览频道今天已完成或任务不存在`)
             }
-
-
+            //浏览商品奖励积分
+            let deskGoodDetails = yield getDeskGoodDetails()
+            if (deskGoodDetails.success) {
+                for (let deskGood of deskGoodDetails.data.deskGoods) {
+                    if (!deskGood.status) {
+                        let scanDeskGoodResult = yield ScanDeskGood(deskGood.sku)
+                        console.log(`浏览频道${deskGood.skuName}结果${JSON.stringify(scanDeskGoodResult)}`)
+                    }
+                }
+            }else{
+                console.log(`浏览商品奖励积分返回结果${JSON.stringify(deskGoodDetails)}`)
+            }
         } else {
             console.log(`任务信息${JSON.stringify(petTaskConfig)}`)
             message = petTaskConfig.errorMessage
@@ -90,8 +100,17 @@ function* step() {
     }
     $notify(name, '', message)
 }
+//浏览商品
+function ScanDeskGood(sku){
+    requestPost(`https://jdjoy.jd.com/pet/scan`, JSON.stringify({ sku: sku, taskType: 'ScanDeskGood', reqSource: 'h5' }), 'application/json')
+}
 
-//
+//浏览商品奖励积分任务
+function getDeskGoodDetails() {
+    request(`https://jdjoy.jd.com/pet/getDeskGoodDetails?reqSource=h5`)
+}
+
+//浏览频道
 function FollowChannel(channelId) {
     requestPost(`https://jdjoy.jd.com/pet/scan`, JSON.stringify({ channelId: channelId, taskType: 'FollowChannel', reqSource: 'h5' }), 'application/json')
 }
@@ -146,10 +165,8 @@ function requestPost(url, body, ContentType) {
         body: body,
         headers: {
             Cookie: cookie,
-            UserAgent: `Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1`,
             reqSource: 'h5',
-            ContentType: ContentType,
-
+            'Content-Type': ContentType,
         },
         method: "POST",
     }).then(
