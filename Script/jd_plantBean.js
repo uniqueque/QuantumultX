@@ -306,7 +306,7 @@ function helpShare(plantUuid) {
         "monitor_refer": "",
         "wxHeadImgUrl": "",
         "shareUuid": "",
-        "followType": "1",
+        "followType": "0",
         "monitor_source": "plant_m_plant_index",
         "version": "9.0.0.1"
     }
