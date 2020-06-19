@@ -138,17 +138,25 @@ function* step() {
                 }
             } else if (task.taskType == 4) {
                 //逛逛会场
-                if (task.isFinished != 1&&task.gainedNum=='0') {
+                if (task.isFinished != 1 && task.gainedNum == '0') {
                     if (plantBeanIndexResult.data.roundList[1].roundState == 2) {
                         let purchaseRewardTaskResult = yield purchaseRewardTask(plantBeanIndexResult.data.roundList[1].roundId)
                         console.log(`purchaseRewardTaskResult:${JSON.stringify(purchaseRewardTaskResult)}`)
                     }
                 }
+            } else if (task.taskType == 1) {
+                console.log('跳过签到，NobyDa的会签')
+                // console.log(`【${task.taskName}】未开发${task.awardType},${task.taskType}`)
             } else {
                 console.log(`【${task.taskName}】未开发${task.awardType},${task.taskType}`)
             }
             console.log(`【${task.taskName}】任务结束`)
         }
+
+        //任务列表少了金融双签，拉出来执行下
+        console.log(`金融双签`)
+        let receiveNutrientsTaskResult = yield receiveNutrientsTask(7)
+        console.log(`receiveNutrientsTaskResult:${JSON.stringify(receiveNutrientsTaskResult)}`)
 
         //助力好友
         console.log('开始助力好友')
@@ -159,7 +167,7 @@ function* step() {
             }
             console.log(`开始助力好友: ${plantUuid}`);
             let helpResult = yield helpShare(plantUuid)
-            if (helpResult.code == 0 ) {
+            if (helpResult.code == 0) {
                 console.log(`助力好友结果: ${JSON.stringify(helpResult.data.helpShareRes)}`);
             } else {
                 console.log(`助力好友失败: ${JSON.stringify(helpResult)}`);
@@ -205,15 +213,16 @@ function purchaseRewardTask(roundId) {
 }
 
 function receiveNutrientsTask(awardType) {
-    let functionId = arguments.callee.name.toString();
-    let body = {
-        "monitor_refer": "plant_receiveNutrientsTask",
-        "monitor_source": "plant_app_plant_index",//plant_app_plant_index,plant_m_plant_index
-        "awardType": `"${awardType}"`,
-        "version": "9.0.0.1"// "9.0.0.1", "8.4.0.0"
-    }
-    // requestGet(`https://api.m.jd.com/client.action?functionId=receiveNutrientsTask&body=%7B%22awardType%22%3A%22${awardType}%22%2C%22monitor_source%22%3A%22plant_m_plant_index%22%2C%22monitor_refer%22%3A%22plant_receiveNutrientsTask%22%2C%22version%22%3A%228.4.0.0%22%7D&appid=ld&client=apple&clientVersion=&networkType=&osVersion=&uuid=&jsonp=jsonp_1592470025833_64949`)
-    request(functionId, body);// `body=${escape(JSON.stringify(body))}&client=apple&appid=ld`
+    // let functionId = arguments.callee.name.toString();
+    // let body = {
+    //     "monitor_refer": "plant_receiveNutrientsTask",
+    //     "monitor_source": "plant_m_plant_index",//plant_app_plant_index,plant_m_plant_index
+    //     "awardType": `"${awardType}"`,
+    //     "version": "9.0.0.1"// "9.0.0.1", "8.4.0.0"
+    // }
+    //这里很奇怪，试了很多情况都不行，直接这样了
+    requestGet(`https://api.m.jd.com/client.action?functionId=receiveNutrientsTask&body=%7B%22awardType%22%3A%22${awardType}%22%2C%22monitor_source%22%3A%22plant_m_plant_index%22%2C%22monitor_refer%22%3A%22plant_receiveNutrientsTask%22%2C%22version%22%3A%228.4.0.0%22%7D&appid=ld&client=apple&clientVersion=&networkType=&osVersion=&uuid=`)
+    // request(functionId, body);// `body=${escape(JSON.stringify(body))}&client=apple&appid=ld`
 }
 
 //https://api.m.jd.com/client.action?functionId=receiveNutrients
@@ -306,7 +315,6 @@ function plantBeanIndex() {
 }
 
 function requestGet(url) {
-    console.log(url)
     $task.fetch({
         url: url,
         headers: {
@@ -315,7 +323,6 @@ function requestGet(url) {
         method: "GET",
     }).then(
         (response) => {
-            // $.log(response.body)
             return JSON.parse(response.body)
         },
         (reason) => console.log(reason.error, reason)
@@ -325,7 +332,6 @@ function requestGet(url) {
 function request(function_id, body = {}) {
     $task.fetch(taskurl(function_id, body)).then(
         (response) => {
-            // $.log(response.body)
             return JSON.parse(response.body)
         },
         (reason) => console.log(reason.error, reason)
@@ -333,12 +339,16 @@ function request(function_id, body = {}) {
 }
 
 function taskurl(function_id, body) {
+    // console.log(`${JD_API_HOST}?functionId=${function_id}&body=${escape(JSON.stringify(body))}&appid=ld&client=apple&clientVersion=&networkType=&osVersion=&uuid=`)
     return {
-        url: `${JD_API_HOST}?functionId=${function_id}&body=${escape(JSON.stringify(body))}&appid=ld&client=apple&clientVersion=&networkType=&osVersion=&uuid=`,
+        // url: `${JD_API_HOST}?functionId=${function_id}&body=${escape(JSON.stringify(body))}&appid=ld&client=apple&clientVersion=&networkType=&osVersion=&uuid=`,
+        url: JD_API_HOST,
+        body: `functionId=${function_id}&body=${JSON.stringify(body)}&appid=ld&client=apple&clientVersion=&networkType=&osVersion=&uuid=`,
         headers: {
             Cookie: cookie,
         },
-        method: "GET",
+        // method: "GET",
+        method: "POST",
     }
 }
 
