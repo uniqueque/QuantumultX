@@ -2,6 +2,12 @@
 种豆得豆
 quantumultx用
 会自动关注任务中的店铺跟商品
+
+
+[task_local]
+
+1 7-21/2 * * * jd_plantBean.js
+
 */
 
 
