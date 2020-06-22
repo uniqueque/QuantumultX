@@ -17,6 +17,7 @@ const name = '京东水果'
 var shareCodes = [ // 这个列表填入你要助力的好友的shareCode，每个人能给别人助力3次，能被人助力5次，每个被助力的人能获得15g，最多5次，满5人，额外领50g
     'a6f686a9f6aa4c80977370b03681c553',
     'f92cb56c6a1349f5a35f0372aa041ea0',
+    '93fab8abcba440e892b1547ff3822853',
 ]
 var Task = step();
 Task.next();
@@ -239,7 +240,6 @@ function* step() {
             //         for (let i = 0; i < turntableFarm.remainLotteryTimes; i++) {
             //             let lottery = yield lotteryForTurntableFarm()
             //             console.log(`第${i + 1}次抽奖结果${JSON.stringify(lottery)}`)
-
             //             if (lottery.code == 0) {
             //                 if (lottery.type == "water") {
             //                     lotteryResult += `水滴${lottery.addWater}g `
