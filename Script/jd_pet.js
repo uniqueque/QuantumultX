@@ -36,7 +36,7 @@ function* entrance() {
     yield petSport(); // 遛弯
     yield slaveHelp();  // 助力, 在顶部shareCodes中填写需要助力的shareCode
 
-
+    yield masterHelpInit();
     // 任务开始
     for (let task_name in function_map) {
         if (!taskInfo[task_name].finished) {
@@ -52,6 +52,33 @@ function* entrance() {
     console.log('全部任务完成, 如果帮助到您可以点下🌟STAR鼓励我一下, 明天见~');
 }
 
+
+// 好友助力信息
+async function masterHelpInit() {
+	let res = await request(arguments.callee.name.toString());
+    console.log('助力信息: ' , res);
+	if (res.code === '0' && res.resultCode === '0' && (res.result.masterHelpPeoples && res.result.masterHelpPeoples.length >= 5)) {
+        if(!res.result.addedBonusFlag) {
+        	console.log("开始领取额外奖励");
+            let getHelpAddedBonusResult = await getHelpAddedBonus();
+            console.log(`领取额外奖励结果：【${getHelpAddedBonusResult.message}】`);
+        } else {
+        	console.log("已经领取过5好友助力额外奖励")
+        }
+	} else {
+		console.log("助力好友未达到5个")
+	}
+	gen.next();
+}
+
+// 领取5好友助力后的奖励
+function getHelpAddedBonus() {
+	return new Promise((rs, rj)=> {
+		request(arguments.callee.name.toString()).then(response=> {
+			rs(response);
+		})
+	})
+}
 
 // 收取所有好感度
 function energyCollect() {
