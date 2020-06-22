@@ -179,6 +179,10 @@ function* step() {
                 console.log(`助力好友失败: ${JSON.stringify(helpResult)}`);
             }
         }
+
+        //todo 扭蛋
+
+
         plantBeanIndexResult = yield plantBeanIndex()
         if (plantBeanIndexResult.code == '0') {
             let plantBeanRound = plantBeanIndexResult.data.roundList[1]
